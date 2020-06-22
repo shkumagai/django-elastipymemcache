@@ -1,46 +1,33 @@
 sudo: false
 language: python
+python:
+  - 3.6
+  - 3.7
+  - 3.8
 cache: pip
+env:
+  - DJANGO=2.2
+  - DJANGO=3.0
+  - DJANGO=dev
+
 matrix:
-  fast_finish: true
   include:
-  - python: 2.7
-    env: TOX_ENV=py27-dj111
-  - python: pypy
-    env: TOX_ENV=pypy-dj111
-  - python: 3.4
-    env: TOX_ENV=py34-dj111
-  - python: 3.5
-    env: TOX_ENV=py35-dj111
-  - python: 3.6
-    env: TOX_ENV=py36-dj111
-  - python: pypy3
-    env: TOX_ENV=pypy3-dj111
-  - python: 3.4
-    env: TOX_ENV=py34-dj20
-  - python: 3.5
-    env: TOX_ENV=py35-dj20
-  - python: 3.6
-    env: TOX_ENV=py36-dj20
-  - python: 3.5
-    env: TOX_ENV=py35-djdev
-  - python: 3.6
-    env: TOX_ENV=py36-djdev
-  - python: 3.6
-    env: TOX_ENV=flake8
-  - python: 3.6
-    env: TOX_ENV=isort
-  - python: 3.6
-    env: TOX_ENV=readme
-  - python: 3.6
-    env: TOX_ENV=check-manifest
+    - python: 3.5
+      env: DJANGO=2.2
+    - python: 3.8
+      env: TOXENV=flake8
+    - python: 3.8
+      env: TOXENV=isort
+    - python: 3.8
+      env: TOXENV=readme
+    - python: 3.8
+      env: TOXENV=manifest
   allow_failures:
-  - env: TOX_ENV=py35-djdev
-  - env: TOX_ENV=py36-djdev
+    - env: DJANGO=dev
 install:
-- pip install tox
+- travis_retry python3 -m pip install tox-travis
 script:
-- tox -e "$TOX_ENV"
+- tox
 deploy:
   provider: pypi
   user: uncovertruth
