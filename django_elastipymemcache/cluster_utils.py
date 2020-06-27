@@ -15,8 +15,9 @@ class WrongProtocolData(ValueError):
     in telnet protocol
     """
     def __init__(self, cmd, response):
-        super(WrongProtocolData, self).__init__(
-            'Unexpected response {} for command {}'.format(response, cmd))
+        super().__init__(
+            'Unexpected response {} for command {}'.format(response, cmd),
+        )
 
 
 def get_cluster_info(

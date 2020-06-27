@@ -1,12 +1,33 @@
 import socket
-import sys
+from unittest.mock import patch, Mock
 
-from nose.tools import eq_
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 
-if sys.version < '3':
-    from mock import patch, Mock
-else:
-    from unittest.mock import patch, Mock
+
+from django.core.cache import InvalidCacheBackendError
+from nose.tools import (
+    eq_,
+    raises,
+)
+
+
+@raises(InvalidCacheBackendError)
+def test_multiple_servers():
+    from django_elastipymemcache.memcached import (
+        ElastiPyMemCache,
+    )
+    ElastiPyMemCache('h1:0,h2:0', {})
+
+
+@raises(InvalidCacheBackendError)
+def test_wrong_server_format():
+    from django_elastipymemcache.memcached import (
+        ElastiPyMemCache,
+    )
+    ElastiPyMemCache('h', {})
 
 
 @patch('django_elastipymemcache.memcached.get_cluster_info')
@@ -65,6 +86,14 @@ def test_node_info_cache(get_cluster_info):
 
 
 @patch('django_elastipymemcache.memcached.get_cluster_info')
+def test_failed_to_connect_servers(get_cluster_info):
+    from django_elastipymemcache.memcached import ElastiPyMemCache
+    backend = ElastiPyMemCache('h:0', {})
+    get_cluster_info.side_effect = OSError()
+    eq_(backend.get_cluster_nodes(), [])
+
+
+@patch('django_elastipymemcache.memcached.get_cluster_info')
 def test_invalidate_cache(get_cluster_info):
     from django_elastipymemcache.memcached import ElastiPyMemCache
     servers = [('h1', 0), ('h2', 0)]
@@ -111,8 +140,7 @@ def test_client_get_many(get_cluster_info):
         ret = backend.get_many(['key2'])
         eq_(ret, {})
 
-    with patch('django_elastipymemcache.client.Client.get_many'), \
-            patch('pymemcache.client.hash.HashClient._safely_run_func') as p2:
+    with patch('pymemcache.client.hash.HashClient._safely_run_func') as p2:
         p2.return_value = {
             ':1:key3': 1509111630.048594
         }
@@ -149,3 +177,57 @@ def test_client_get_many(get_cluster_info):
                 'key2': 1509111630.048594,
             },
         )
+
+
+@patch('django_elastipymemcache.memcached.get_cluster_info')
+def test_client_set_many(get_cluster_info):
+    from django_elastipymemcache.memcached import ElastiPyMemCache
+
+    servers = [('h1', 0), ('h2', 0)]
+    get_cluster_info.return_value = {
+        'nodes': servers
+    }
+
+    backend = ElastiPyMemCache('h:0', {})
+    ret = backend.set_many({'key1': 'value1', 'key2': 'value2'})
+    eq_(ret, ['key1', 'key2'])
+
+
+@patch('django_elastipymemcache.memcached.get_cluster_info')
+def test_client_delete(get_cluster_info):
+    from django_elastipymemcache.memcached import ElastiPyMemCache
+
+    servers = [('h1', 0), ('h2', 0)]
+    get_cluster_info.return_value = {
+        'nodes': servers
+    }
+
+    backend = ElastiPyMemCache('h:0', {})
+    ret = backend.delete('key1')
+    eq_(ret, None)
+
+
+@patch('django_elastipymemcache.memcached.get_cluster_info')
+def test_client_delete_many(get_cluster_info):
+    from django_elastipymemcache.memcached import ElastiPyMemCache
+
+    servers = [('h1', 0), ('h2', 0)]
+    get_cluster_info.return_value = {
+        'nodes': servers
+    }
+
+    backend = ElastiPyMemCache('h:0', {})
+    ret = backend.delete_many(['key1', 'key2'])
+    eq_(ret, None)
+
+
+def test_serialize_pickle():
+    from django_elastipymemcache.memcached import serialize_pickle
+    eq_(serialize_pickle('key', 'str'), ('str', 1))
+    eq_(serialize_pickle('key', 0), (pickle.dumps(0), 2))
+
+
+def test_deserialize_pickle():
+    from django_elastipymemcache.memcached import deserialize_pickle
+    eq_(deserialize_pickle('key', 'str', 1), 'str')
+    eq_(deserialize_pickle('key', pickle.dumps(0), 2), 0)
