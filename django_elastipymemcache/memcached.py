@@ -13,7 +13,7 @@ except ImportError:
 from django.core.cache import InvalidCacheBackendError
 from django.core.cache.backends.memcached import BaseMemcachedCache
 
-from . import client as pyMemcache_client
+from . import client as pymemcache_client
 from .cluster_utils import get_cluster_info
 
 
@@ -53,10 +53,10 @@ class ElastiPyMemCache(BaseMemcachedCache):
     it used pyMemcache
     """
     def __init__(self, server, params):
-        super(ElastiPyMemCache, self).__init__(
+        super().__init__(
             server,
             params,
-            library=pyMemcache_client,
+            library=pymemcache_client,
             value_not_found_exception=ValueError)
         if len(self._servers) > 1:
             raise InvalidCacheBackendError(
@@ -115,24 +115,24 @@ class ElastiPyMemCache(BaseMemcachedCache):
 
     @invalidate_cache_after_error
     def get(self, *args, **kwargs):
-        return super(ElastiPyMemCache, self).get(*args, **kwargs)
+        return super().get(*args, **kwargs)
 
     @invalidate_cache_after_error
     def get_many(self, *args, **kwargs):
-        return super(ElastiPyMemCache, self).get_many(*args, **kwargs)
+        return super().get_many(*args, **kwargs)
 
     @invalidate_cache_after_error
     def set(self, *args, **kwargs):
-        return super(ElastiPyMemCache, self).set(*args, **kwargs)
+        return super().set(*args, **kwargs)
 
     @invalidate_cache_after_error
     def set_many(self, *args, **kwargs):
-        return super(ElastiPyMemCache, self).set_many(*args, **kwargs)
+        return super().set_many(*args, **kwargs)
 
     @invalidate_cache_after_error
     def delete(self, *args, **kwargs):
-        return super(ElastiPyMemCache, self).delete(*args, **kwargs)
+        return super().delete(*args, **kwargs)
 
     @invalidate_cache_after_error
     def delete_many(self, *args, **kwargs):
-        return super(ElastiPyMemCache, self).delete_many(*args, **kwargs)
+        return super().delete_many(*args, **kwargs)
