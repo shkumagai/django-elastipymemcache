@@ -26,7 +26,7 @@ EXAMPLE_RESPONSE = (
 
 
 @patch('django_elastipymemcache.cluster_utils.Telnet')
-def test_happy_path(Telnet):
+def test_get_cluster_info(Telnet):
     client = Telnet.return_value
     client.read_until.side_effect = [
         b'VERSION 1.4.14',
@@ -43,6 +43,24 @@ def test_happy_path(Telnet):
     ])
 
 
+@patch('django_elastipymemcache.cluster_utils.Telnet')
+def test_get_cluster_info_before_1_4_13(Telnet):
+    client = Telnet.return_value
+    client.read_until.side_effect = [
+        b'VERSION 1.4.13',
+    ]
+    client.expect.side_effect = [
+        (0, None, EXAMPLE_RESPONSE),  # NOQA
+    ]
+    info = get_cluster_info('', 0)
+    eq_(info['version'], 12)
+    eq_(info['nodes'], [('10.82.235.120', 11211), ('10.80.249.27', 11211)])
+    client.write.assert_has_calls([
+        call(b'version\n'),
+        call(b'get AmazonElastiCache:cluster\n'),
+    ])
+
+
 @raises(WrongProtocolData)
 @patch('django_elastipymemcache.cluster_utils.Telnet', MagicMock())
 def test_bad_protocol():
@@ -56,7 +74,7 @@ def test_ubuntu_protocol(Telnet):
         b'VERSION 1.4.14 (Ubuntu)',
     ]
     client.expect.side_effect = [
-        (0, None, b'CONFIG cluster 0 138\r\n1\nhost|ip|11211 host||11211\n\r\nEND\r\n'),  # NOQA
+        (0, None, EXAMPLE_RESPONSE),  # NOQA
     ]
     get_cluster_info('', 0)
     client.write.assert_has_calls([
@@ -80,7 +98,7 @@ def test_no_configuration_protocol_support_with_errors(Telnet):
 
 @raises(WrongProtocolData)
 @patch('django_elastipymemcache.cluster_utils.Telnet')
-def test_hoge(Telnet):
+def test_cannot_parse_version(Telnet):
     client = Telnet.return_value
     client.read_until.side_effect = [
         b'VERSION 1.4.34',
@@ -93,7 +111,7 @@ def test_hoge(Telnet):
 
 @raises(WrongProtocolData)
 @patch('django_elastipymemcache.cluster_utils.Telnet')
-def test_no_configuration_protocol_support_with_errors_but_ignored(Telnet):
+def test_cannot_parse_nodes(Telnet):
     client = Telnet.return_value
     client.read_until.side_effect = [
         b'VERSION 1.4.34',

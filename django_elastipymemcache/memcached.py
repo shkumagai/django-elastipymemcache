@@ -5,11 +5,6 @@ import logging
 import socket
 from functools import wraps
 
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
-
 from django.core.cache import InvalidCacheBackendError
 from django.core.cache.backends.memcached import BaseMemcachedCache
 
@@ -20,22 +15,9 @@ from .cluster_utils import get_cluster_info
 logger = logging.getLogger(__name__)
 
 
-def serialize_pickle(key, value):
-    if isinstance(value, str):
-        return value, 1
-    return pickle.dumps(value), 2
-
-
-def deserialize_pickle(key, value, flags):
-    if flags == 1:
-        return value
-    if flags == 2:
-        return pickle.loads(value)
-
-
 def invalidate_cache_after_error(f):
     """
-    catch any exception and invalidate internal cache with list of nodes
+    Catch any exception and invalidate internal cache with list of nodes
     """
     @wraps(f)
     def wrapper(self, *args, **kwds):
@@ -49,37 +31,47 @@ def invalidate_cache_after_error(f):
 
 class ElastiPyMemCache(BaseMemcachedCache):
     """
-    backend for Amazon ElastiCache (memcached) with auto discovery mode
-    it used pyMemcache
+    Backend for Amazon ElastiCache (memcached) with auto discovery mode
+    it used pymemcache
     """
     def __init__(self, server, params):
+        params['OPTIONS'] = params.get('OPTIONS', {})
+        params['OPTIONS'].setdefault('ignore_exc', True)
+
+        self._cluster_timeout = params['OPTIONS'].pop(
+            'cluster_timeout',
+            socket._GLOBAL_DEFAULT_TIMEOUT,
+        )
+        self._ignore_cluster_errors = params['OPTIONS'].pop(
+            'ignore_cluster_errors',
+            False,
+        )
+
         super().__init__(
             server,
             params,
             library=pymemcache_client,
-            value_not_found_exception=ValueError)
+            value_not_found_exception=ValueError,
+        )
+
         if len(self._servers) > 1:
             raise InvalidCacheBackendError(
                 'ElastiCache should be configured with only one server '
-                '(Configuration Endpoint)')
+                '(Configuration Endpoint)',
+            )
+
         if len(self._servers[0].split(':')) != 2:
             raise InvalidCacheBackendError(
-                'Server configuration should be in format IP:port')
-
-        self._cluster_timeout = self._options.get(
-                'cluster_timeout', socket._GLOBAL_DEFAULT_TIMEOUT)
-        self._ignore_cluster_errors = self._options.get(
-                'ignore_cluster_errors', False)
+                'Server configuration should be in format IP:Port',
+            )
 
     def clear_cluster_nodes_cache(self):
-        """clear internal cache with list of nodes in cluster"""
+        """Clear internal cache with list of nodes in cluster"""
         if hasattr(self, '_client'):
             del self._client
 
     def get_cluster_nodes(self):
-        """
-        return list with all nodes in cluster
-        """
+        """Return list with all nodes in cluster"""
         server, port = self._servers[0].split(':')
         try:
             return get_cluster_info(
@@ -92,47 +84,49 @@ class ElastiPyMemCache(BaseMemcachedCache):
             logger.debug(
                 'Cannot connect to cluster %s, err: %s',
                 self._servers[0],
-                err
+                err,
             )
             return []
 
     @property
     def _cache(self):
-
         if getattr(self, '_client', None) is None:
-
-            options = self._options
-            options['serializer'] = serialize_pickle
-            options['deserializer'] = deserialize_pickle
-            options.setdefault('ignore_exc', True)
-            options.pop('cluster_timeout', None)
-            options.pop('ignore_cluster_errors', None)
-
             self._client = self._lib.Client(
-                self.get_cluster_nodes(), **options)
-
+                self.get_cluster_nodes(), **self._options)
         return self._client
+
+    @invalidate_cache_after_error
+    def add(self, *args, **kwargs):
+        return super().add(*args, **kwargs)
 
     @invalidate_cache_after_error
     def get(self, *args, **kwargs):
         return super().get(*args, **kwargs)
 
     @invalidate_cache_after_error
-    def get_many(self, *args, **kwargs):
-        return super().get_many(*args, **kwargs)
-
-    @invalidate_cache_after_error
     def set(self, *args, **kwargs):
         return super().set(*args, **kwargs)
-
-    @invalidate_cache_after_error
-    def set_many(self, *args, **kwargs):
-        return super().set_many(*args, **kwargs)
 
     @invalidate_cache_after_error
     def delete(self, *args, **kwargs):
         return super().delete(*args, **kwargs)
 
     @invalidate_cache_after_error
+    def get_many(self, *args, **kwargs):
+        return super().get_many(*args, **kwargs)
+
+    @invalidate_cache_after_error
+    def set_many(self, *args, **kwargs):
+        return super().set_many(*args, **kwargs)
+
+    @invalidate_cache_after_error
     def delete_many(self, *args, **kwargs):
         return super().delete_many(*args, **kwargs)
+
+    @invalidate_cache_after_error
+    def incr(self, *args, **kwargs):
+        return super().incr(*args, **kwargs)
+
+    @invalidate_cache_after_error
+    def decr(self, *args, **kwargs):
+        return super().decr(*args, **kwargs)

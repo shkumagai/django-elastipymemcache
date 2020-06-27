@@ -1,5 +1,5 @@
 """
-utils for discovery cluster
+Utils for discovery cluster
 """
 import re
 from distutils.version import StrictVersion
@@ -26,11 +26,11 @@ def get_cluster_info(
         ignore_cluster_errors=False,
         timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
     """
-    return dict with info about nodes in cluster and current version
+    Return dict with info about nodes in cluster and current version
     {
         'nodes': [
-            'IP:port',
-            'IP:port',
+            'IP:Port',
+            'IP:Port',
         ],
         'version': '1.4.4'
     }
