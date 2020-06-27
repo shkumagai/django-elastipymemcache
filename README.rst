@@ -2,21 +2,11 @@
 django-elastipymemcache
 =======================
 
-:Info: Simple Django cache backend for Amazon ElastiCache (memcached based).
-:Author: UNCOVER TRUTH Inc. <develop@uncovertruth.co.jp>
-:Copyright: © UNCOVER TRUTH Inc.
-:Date: 2018-06-19
-:Version: 1.2.1
-
 .. index: README
-.. image:: https://travis-ci.org/uncovertruth/django-elastipymemcache.svg?branch=master
-    :target: https://travis-ci.org/uncovertruth/django-elastipymemcache
-.. image:: https://codecov.io/gh/uncovertruth/django-elastipymemcache/branch/master/graph/badge.svg
-    :target: https://codecov.io/gh/uncovertruth/django-elastipymemcache
-.. image:: https://requires.io/github/uncovertruth/django-elastipymemcache/requirements.svg?branch=master
-    :target: https://requires.io/github/uncovertruth/django-elastipymemcache/requirements/?branch=master
-.. image:: https://badge.fury.io/py/django-elastipymemcache.svg
-    :target: https://badge.fury.io/py/django-elastipymemcache
+.. image:: https://travis-ci.org/harikitech/django-elastipymemcache.svg?branch=master
+    :target: https://travis-ci.org/harikitech/django-elastipymemcache
+.. image:: https://codecov.io/gh/harikitech/django-elastipymemcache/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/harikitech/django-elastipymemcache
 
 Purpose
 -------
@@ -31,7 +21,7 @@ Requirements
 ------------
 
 * pymemcache
-* Django>=1.11
+* Django>=2.2
 
 Installation
 ------------
