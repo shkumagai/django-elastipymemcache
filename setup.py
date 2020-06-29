@@ -35,7 +35,7 @@ setup(
     packages=find_packages(exclude=('tests',)),
     include_package_data=True,
     install_requires=[
-        'pymemcache',
+        'django-pymemcache>=1.0',
         'Django>=2.2',
     ],
 )
