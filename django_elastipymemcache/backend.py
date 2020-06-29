@@ -84,7 +84,12 @@ class ElastiPymemcache(BaseMemcachedCache):
             OSError,
             socket.gaierror,
             socket.timeout,
-        ):
+        ) as e:
+            logger.warn(
+                'Cannot connect to cluster %s, err: %s',
+                self.configuration_endpoint_client.server,
+                e,
+            )
             return []
 
     @property
