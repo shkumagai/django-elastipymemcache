@@ -29,7 +29,7 @@ def invalidate_cache_after_error(f):
     return wrapper
 
 
-class ElastiPyMemCache(BaseMemcachedCache):
+class ElastiPymemcache(BaseMemcachedCache):
     """
     Backend for Amazon ElastiCache (memcached) with auto discovery mode
     it used pymemcache

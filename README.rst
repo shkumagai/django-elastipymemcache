@@ -38,7 +38,7 @@ Your cache backend should look something like this::
 
     CACHES = {
         'default': {
-            'BACKEND': 'django_elastipymemcache.memcached.ElastiPyMemCache',
+            'BACKEND': 'django_elastipymemcache.backend.ElastiPymemcache',
             'LOCATION': '[configuration endpoint]:11211',
             'OPTIONS': {
               'cluster_timeout': 1, # its used when get cluster info
