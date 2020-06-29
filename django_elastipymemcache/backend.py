@@ -7,9 +7,9 @@ from functools import wraps
 
 from django.core.cache import InvalidCacheBackendError
 from django.core.cache.backends.memcached import BaseMemcachedCache
-
 from djpymemcache import client as djpymemcache_client
-from .cluster_utils import get_cluster_info
+
+from .client import ConfigurationEndpointClient
 
 
 logger = logging.getLogger(__name__)
@@ -59,11 +59,18 @@ class ElastiPymemcache(BaseMemcachedCache):
                 'ElastiCache should be configured with only one server '
                 '(Configuration Endpoint)',
             )
-
-        if len(self._servers[0].split(':')) != 2:
+        try:
+            host, port = self._servers[0].split(':')
+        except ValueError:
             raise InvalidCacheBackendError(
                 'Server configuration should be in format IP:Port',
             )
+
+        self.configuration_endpoint_client = ConfigurationEndpointClient(
+            (host, port),
+            ignore_cluster_errors=self._ignore_cluster_errors,
+            **self._options,
+        )
 
     def clear_cluster_nodes_cache(self):
         """Clear internal cache with list of nodes in cluster"""
@@ -71,28 +78,23 @@ class ElastiPymemcache(BaseMemcachedCache):
             del self._client
 
     def get_cluster_nodes(self):
-        """Return list with all nodes in cluster"""
-        server, port = self._servers[0].split(':')
         try:
-            return get_cluster_info(
-                server,
-                port,
-                self._ignore_cluster_errors,
-                self._cluster_timeout
-            )['nodes']
-        except (OSError, socket.gaierror, socket.timeout) as err:
-            logger.debug(
-                'Cannot connect to cluster %s, err: %s',
-                self._servers[0],
-                err,
-            )
+            return self.configuration_endpoint_client \
+                .get_cluster_info()['nodes']
+        except (
+            OSError,
+            socket.gaierror,
+            socket.timeout,
+        ):
             return []
 
     @property
     def _cache(self):
         if getattr(self, '_client', None) is None:
             self._client = self._lib.Client(
-                self.get_cluster_nodes(), **self._options)
+                self.get_cluster_nodes(),
+                **self._options,
+            )
         return self._client
 
     @invalidate_cache_after_error

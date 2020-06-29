@@ -10,6 +10,8 @@ from nose.tools import (
     raises,
 )
 
+from django_elastipymemcache.client import ConfigurationEndpointClient
+
 
 @raises(InvalidCacheBackendError)
 def test_multiple_servers():
@@ -23,7 +25,7 @@ def test_wrong_server_format():
     ElastiPymemcache('h', {})
 
 
-@patch('django_elastipymemcache.backend.get_cluster_info')
+@patch.object(ConfigurationEndpointClient, 'get_cluster_info')
 def test_split_servers(get_cluster_info):
     from django_elastipymemcache.backend import ElastiPymemcache
     backend = ElastiPymemcache('h:0', {})
@@ -33,15 +35,14 @@ def test_split_servers(get_cluster_info):
     }
     backend._lib.Client = Mock()
     assert backend._cache
-    get_cluster_info.assert_called_once_with(
-            'h', '0', False, socket._GLOBAL_DEFAULT_TIMEOUT)
+    get_cluster_info.assert_called()
     backend._lib.Client.assert_called_once_with(
         servers,
         ignore_exc=True,
     )
 
 
-@patch('django_elastipymemcache.backend.get_cluster_info')
+@patch.object(ConfigurationEndpointClient, 'get_cluster_info')
 def test_node_info_cache(get_cluster_info):
     from django_elastipymemcache.backend import ElastiPymemcache
     servers = ['h1:0', 'h2:0']
@@ -62,11 +63,10 @@ def test_node_info_cache(get_cluster_info):
     eq_(backend._cache.get.call_count, 2)
     eq_(backend._cache.set.call_count, 2)
 
-    get_cluster_info.assert_called_once_with(
-            'h', '0', False, socket._GLOBAL_DEFAULT_TIMEOUT)
+    get_cluster_info.assert_called_once()
 
 
-@patch('django_elastipymemcache.backend.get_cluster_info')
+@patch.object(ConfigurationEndpointClient, 'get_cluster_info')
 def test_failed_to_connect_servers(get_cluster_info):
     from django_elastipymemcache.backend import ElastiPymemcache
     backend = ElastiPymemcache('h:0', {})
@@ -74,7 +74,7 @@ def test_failed_to_connect_servers(get_cluster_info):
     eq_(backend.get_cluster_nodes(), [])
 
 
-@patch('django_elastipymemcache.backend.get_cluster_info')
+@patch.object(ConfigurationEndpointClient, 'get_cluster_info')
 def test_invalidate_cache(get_cluster_info):
     from django_elastipymemcache.backend import ElastiPymemcache
     servers = ['h1:0', 'h2:0']
@@ -102,7 +102,7 @@ def test_invalidate_cache(get_cluster_info):
     eq_(get_cluster_info.call_count, 3)
 
 
-@patch('django_elastipymemcache.backend.get_cluster_info')
+@patch.object(ConfigurationEndpointClient, 'get_cluster_info')
 def test_client_add(get_cluster_info):
     from django_elastipymemcache.backend import ElastiPymemcache
 
@@ -116,7 +116,7 @@ def test_client_add(get_cluster_info):
     eq_(ret, False)
 
 
-@patch('django_elastipymemcache.backend.get_cluster_info')
+@patch.object(ConfigurationEndpointClient, 'get_cluster_info')
 def test_client_delete(get_cluster_info):
     from django_elastipymemcache.backend import ElastiPymemcache
 
@@ -130,7 +130,7 @@ def test_client_delete(get_cluster_info):
     eq_(ret, None)
 
 
-@patch('django_elastipymemcache.backend.get_cluster_info')
+@patch.object(ConfigurationEndpointClient, 'get_cluster_info')
 def test_client_get_many(get_cluster_info):
     from django_elastipymemcache.backend import ElastiPymemcache
 
@@ -188,7 +188,7 @@ def test_client_get_many(get_cluster_info):
         )
 
 
-@patch('django_elastipymemcache.backend.get_cluster_info')
+@patch.object(ConfigurationEndpointClient, 'get_cluster_info')
 def test_client_set_many(get_cluster_info):
     from django_elastipymemcache.backend import ElastiPymemcache
 
@@ -202,7 +202,7 @@ def test_client_set_many(get_cluster_info):
     eq_(ret, ['key1', 'key2'])
 
 
-@patch('django_elastipymemcache.backend.get_cluster_info')
+@patch.object(ConfigurationEndpointClient, 'get_cluster_info')
 def test_client_delete_many(get_cluster_info):
     from django_elastipymemcache.backend import ElastiPymemcache
 
@@ -216,7 +216,7 @@ def test_client_delete_many(get_cluster_info):
     eq_(ret, None)
 
 
-@patch('django_elastipymemcache.backend.get_cluster_info')
+@patch.object(ConfigurationEndpointClient, 'get_cluster_info')
 def test_client_incr(get_cluster_info):
     from django_elastipymemcache.backend import ElastiPymemcache
 
@@ -230,7 +230,7 @@ def test_client_incr(get_cluster_info):
     eq_(ret, False)
 
 
-@patch('django_elastipymemcache.backend.get_cluster_info')
+@patch.object(ConfigurationEndpointClient, 'get_cluster_info')
 def test_client_decr(get_cluster_info):
     from django_elastipymemcache.backend import ElastiPymemcache
 
