@@ -8,7 +8,7 @@ from functools import wraps
 from django.core.cache import InvalidCacheBackendError
 from django.core.cache.backends.memcached import BaseMemcachedCache
 
-from . import client as pymemcache_client
+from djpymemcache import client as djpymemcache_client
 from .cluster_utils import get_cluster_info
 
 
@@ -50,7 +50,7 @@ class ElastiPyMemCache(BaseMemcachedCache):
         super().__init__(
             server,
             params,
-            library=pymemcache_client,
+            library=djpymemcache_client,
             value_not_found_exception=ValueError,
         )
 

@@ -36,7 +36,7 @@ def test_get_cluster_info(Telnet):
     ]
     info = get_cluster_info('', 0)
     eq_(info['version'], 12)
-    eq_(info['nodes'], [('10.82.235.120', 11211), ('10.80.249.27', 11211)])
+    eq_(info['nodes'], ['10.82.235.120:11211', '10.80.249.27:11211'])
     client.write.assert_has_calls([
         call(b'version\n'),
         call(b'config get cluster\n'),
@@ -54,7 +54,7 @@ def test_get_cluster_info_before_1_4_13(Telnet):
     ]
     info = get_cluster_info('', 0)
     eq_(info['version'], 12)
-    eq_(info['nodes'], [('10.82.235.120', 11211), ('10.80.249.27', 11211)])
+    eq_(info['nodes'], ['10.82.235.120:11211', '10.80.249.27:11211'])
     client.write.assert_has_calls([
         call(b'version\n'),
         call(b'get AmazonElastiCache:cluster\n'),

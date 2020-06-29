@@ -44,7 +44,7 @@ def test_split_servers(get_cluster_info):
 @patch('django_elastipymemcache.memcached.get_cluster_info')
 def test_node_info_cache(get_cluster_info):
     from django_elastipymemcache.memcached import ElastiPyMemCache
-    servers = [('h1', 0), ('h2', 0)]
+    servers = ['h1:0', 'h2:0']
     get_cluster_info.return_value = {
         'nodes': servers
     }
@@ -77,7 +77,7 @@ def test_failed_to_connect_servers(get_cluster_info):
 @patch('django_elastipymemcache.memcached.get_cluster_info')
 def test_invalidate_cache(get_cluster_info):
     from django_elastipymemcache.memcached import ElastiPyMemCache
-    servers = [('h1', 0), ('h2', 0)]
+    servers = ['h1:0', 'h2:0']
     get_cluster_info.return_value = {
         'nodes': servers
     }
@@ -106,7 +106,7 @@ def test_invalidate_cache(get_cluster_info):
 def test_client_add(get_cluster_info):
     from django_elastipymemcache.memcached import ElastiPyMemCache
 
-    servers = [('h1', 0), ('h2', 0)]
+    servers = ['h1:0', 'h2:0']
     get_cluster_info.return_value = {
         'nodes': servers
     }
@@ -120,7 +120,7 @@ def test_client_add(get_cluster_info):
 def test_client_delete(get_cluster_info):
     from django_elastipymemcache.memcached import ElastiPyMemCache
 
-    servers = [('h1', 0), ('h2', 0)]
+    servers = ['h1:0', 'h2:0']
     get_cluster_info.return_value = {
         'nodes': servers
     }
@@ -134,7 +134,7 @@ def test_client_delete(get_cluster_info):
 def test_client_get_many(get_cluster_info):
     from django_elastipymemcache.memcached import ElastiPyMemCache
 
-    servers = [('h1', 0), ('h2', 0)]
+    servers = ['h1:0', 'h2:0']
     get_cluster_info.return_value = {
         'nodes': servers
     }
@@ -192,7 +192,7 @@ def test_client_get_many(get_cluster_info):
 def test_client_set_many(get_cluster_info):
     from django_elastipymemcache.memcached import ElastiPyMemCache
 
-    servers = [('h1', 0), ('h2', 0)]
+    servers = ['h1:0', 'h2:0']
     get_cluster_info.return_value = {
         'nodes': servers
     }
@@ -206,7 +206,7 @@ def test_client_set_many(get_cluster_info):
 def test_client_delete_many(get_cluster_info):
     from django_elastipymemcache.memcached import ElastiPyMemCache
 
-    servers = [('h1', 0), ('h2', 0)]
+    servers = ['h1:0', 'h2:0']
     get_cluster_info.return_value = {
         'nodes': servers
     }
@@ -220,7 +220,7 @@ def test_client_delete_many(get_cluster_info):
 def test_client_incr(get_cluster_info):
     from django_elastipymemcache.memcached import ElastiPyMemCache
 
-    servers = [('h1', 0), ('h2', 0)]
+    servers = ['h1:0', 'h2:0']
     get_cluster_info.return_value = {
         'nodes': servers
     }
@@ -234,7 +234,7 @@ def test_client_incr(get_cluster_info):
 def test_client_decr(get_cluster_info):
     from django_elastipymemcache.memcached import ElastiPyMemCache
 
-    servers = [('h1', 0), ('h2', 0)]
+    servers = ['h1:0', 'h2:0']
     get_cluster_info.return_value = {
         'nodes': servers
     }
