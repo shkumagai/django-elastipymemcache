@@ -60,6 +60,7 @@ class ElastiPymemcache(BaseMemcachedCache):
             )
         try:
             host, port = self._servers[0].split(':')
+            port = int(port)
         except ValueError:
             raise InvalidCacheBackendError(
                 'Server configuration should be in format IP:Port',
