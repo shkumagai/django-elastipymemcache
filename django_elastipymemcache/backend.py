@@ -11,7 +11,6 @@ from djpymemcache import client as djpymemcache_client
 
 from .client import ConfigurationEndpointClient
 
-
 logger = logging.getLogger(__name__)
 
 

@@ -1,20 +1,13 @@
 import collections
-from unittest.mock import (
-    call,
-    patch,
-)
+from unittest.mock import call, patch
 
+from nose.tools import eq_, raises
 from pymemcache.exceptions import (
     MemcacheUnknownCommandError,
     MemcacheUnknownError,
 )
-from nose.tools import (
-    eq_,
-    raises,
-)
 
 from django_elastipymemcache.client import ConfigurationEndpointClient
-
 
 EXAMPLE_RESPONSE = [
     b'CONFIG cluster 0 147\r\n',

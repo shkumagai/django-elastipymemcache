@@ -1,14 +1,8 @@
 import socket
-from unittest.mock import (
-    patch,
-    Mock,
-)
+from unittest.mock import Mock, patch
 
 from django.core.cache import InvalidCacheBackendError
-from nose.tools import (
-    eq_,
-    raises,
-)
+from nose.tools import eq_, raises
 
 from django_elastipymemcache.client import ConfigurationEndpointClient
 

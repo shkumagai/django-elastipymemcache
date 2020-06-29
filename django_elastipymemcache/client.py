@@ -2,14 +2,8 @@ import logging
 from distutils.version import StrictVersion
 
 from django.utils.encoding import smart_text
-from pymemcache.exceptions import (
-    MemcacheUnknownError,
-)
-from pymemcache.client.base import (
-    _readline,
-    Client,
-)
-
+from pymemcache.client.base import Client, _readline
+from pymemcache.exceptions import MemcacheUnknownError
 
 logger = logging.getLogger(__name__)
 
