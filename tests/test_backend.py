@@ -1,4 +1,3 @@
-import socket
 from unittest.mock import Mock, patch
 
 from django.core.cache import InvalidCacheBackendError
