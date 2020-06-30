@@ -12,8 +12,9 @@ class ConfigurationEndpointClient(Client):
     # https://docs.aws.amazon.com/AmazonElastiCache/latest/mem-ug/AutoDiscovery.AddingToYourClientLibrary.html
 
     def __init__(self, *args, ignore_cluster_errors=False, **kwargs):
+        client = super().__init__(*args, **kwargs)
         self.ignore_cluster_errors = ignore_cluster_errors
-        return super().__init__(*args, **kwargs)
+        return client
 
     def _get_cluster_info_cmd(self):
         if StrictVersion(smart_text(self.version())) < StrictVersion('1.4.14'):
