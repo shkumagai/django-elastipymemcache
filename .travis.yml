@@ -19,7 +19,7 @@ matrix:
     - python: 3.8
       env: TOXENV=readme
     - python: 3.8
-      env: TOXENV=manifest
+      env: TOXENV=check-manifest
   allow_failures:
     - env: DJANGO=dev
 install:
