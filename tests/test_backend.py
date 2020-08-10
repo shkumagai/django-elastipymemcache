@@ -1,5 +1,6 @@
 from unittest.mock import Mock, patch
 
+import django
 from django.core.cache import InvalidCacheBackendError
 from nose.tools import eq_, raises
 
@@ -120,7 +121,10 @@ def test_client_delete(get_cluster_info):
 
     backend = ElastiPymemcache('h:0', {})
     ret = backend.delete('key1')
-    eq_(ret, None)
+    if django.get_version() >= '3.1':
+        eq_(ret, False)
+    else:
+        eq_(ret, None)
 
 
 @patch.object(ConfigurationEndpointClient, 'get_cluster_info')
