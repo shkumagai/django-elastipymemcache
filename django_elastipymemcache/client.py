@@ -66,7 +66,7 @@ class ConfigurationEndpointClient(Client):
             return self._fetch_cluster_info_cmd(cmd, 'config cluster')
         except Exception as e:
             if self.ignore_cluster_errors:
-                logger.warn('Failed to get cluster: %s', e)
+                logger.warning('Failed to get cluster: %s', e)
                 return {
                     'version': None,
                     'nodes': [
