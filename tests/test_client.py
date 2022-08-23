@@ -27,7 +27,8 @@ def test_get_cluster_info(socket):
     client = socket.return_value
     client.recv.side_effect = lambda *args, **kwargs: recv_bufs.popleft()
     cluster_info = ConfigurationEndpointClient(('h', 0)).get_cluster_info()
-    eq_(cluster_info['nodes'], ['10.82.235.120:11211', '10.80.249.27:11211'])
+    assert cluster_info['nodes'] == \
+        ['10.82.235.120:11211', '10.80.249.27:11211']
     client.sendall.assert_has_calls([
         call(b'version\r\n'),
         call(b'config get cluster\r\n'),
@@ -107,4 +108,4 @@ def test_ignore_erros(socket):
         ('h', 0),
         ignore_cluster_errors=True,
     ).get_cluster_info()
-    eq_(cluster_info['nodes'], ['h:0'])
+    assert cluster_info['nodes'] == ['h:0']
